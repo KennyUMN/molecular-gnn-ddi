@@ -16,7 +16,9 @@ from src.personalization import PatientRiskAdjustment
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 DRUGS_FILE = os.path.join(DATA_DIR, "drugs_database.json")
 SAMPLE_DDI_FILE = os.path.join(DATA_DIR, "sample_ddi.csv")
-# Prefer the Kaggle-trained checkpoint (runs_kaggle/random), fall back to models/.
+# Prefer the Kaggle-trained checkpoint (runs_kaggle/random). NOTE: models/best_model.pt
+# is STALE (older run, Sep 16) — it is kept only as a last-resort fallback; the served
+# weights are runs_kaggle/random/best_model.pt whenever present.
 _CKPT_CANDIDATES = [os.environ.get("DDI_CHECKPOINT"),
                     os.path.join(PROJECT_ROOT, "runs_kaggle", "random", "best_model.pt"),
                     os.path.join(PROJECT_ROOT, "models", "best_model.pt")]
