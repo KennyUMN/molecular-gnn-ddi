@@ -9,6 +9,40 @@ from reportlab.platypus import (
 )
 from reportlab.pdfgen import canvas
 
+# --- Metric loader: read the authoritative run artifacts, never hardcode. ---
+# Numbers in this report must trace to runs_kaggle/*/summary.json (the Kaggle
+# run named in the README), not to string literals that silently go stale.
+import json as _json
+
+_PROJECT_ROOT = "/Users/kennyvws/projects/molecular-gnn-ddi"
+
+
+def _load_metrics():
+    def _s(split):
+        with open(os.path.join(_PROJECT_ROOT, "runs_kaggle", split, "summary.json")) as f:
+            return _json.load(f)
+    rnd, scf, cold = _s("random"), _s("scaffold"), _s("cold_start")
+    test = lambda d: d["test"]
+    try:
+        with open(os.path.join(_PROJECT_ROOT, "runs_kaggle", "onnx_latency.json")) as f:
+            lat = _json.load(f)
+        lat_ms = lat["random"]["single_thread_ms_per_pair"]
+    except Exception:
+        lat_ms = None
+    onnx_kb = cold.get("onnx", {}).get("molecular_gnn_ddi.onnx")
+    m = {
+        "rnd_auroc": test(rnd)["auroc"], "rnd_auprc": test(rnd)["auprc"],
+        "scf_auroc": test(scf)["auroc"], "scf_auprc": test(scf)["auprc"],
+        "cold_auroc": test(cold)["auroc"], "cold_auprc": test(cold)["auprc"],
+        "onnx_kb": onnx_kb, "lat_ms": lat_ms,
+    }
+    m["delta_scf"] = m["rnd_auroc"] - m["scf_auroc"]
+    m["delta_cold"] = m["rnd_auroc"] - m["cold_auroc"]
+    return m
+
+
+M = _load_metrics()
+
 class NumberedCanvas(canvas.Canvas):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -177,7 +211,8 @@ def build_pdf(filename):
             "pada transductive random split di mana model sekadar menghafal analog cincin kimiawi (AUROC jatuh 20–30% saat cold-start), dan "
             "<b>(2) Translational Disconnect</b> di mana 100% model Q1 beroperasi murni sebagai model kimia <i>in-vitro</i> statis yang buta "
             "terhadap profil fisiologis pasien nyata. <b>PharmaGNN</b> mengatasi kedua masalah ini dengan memadukan GATv2 substructure "
-            "cross-attention invarian komutatif yang sangat efisien (118k parameter, 815 KB ONNX, ~0.21 ms CPU) serta mengintegrasikan "
+            "cross-attention invarian komutatif yang sangat efisien (118k parameter, "
+            f"{M['onnx_kb']:.0f} KB ONNX, ~{M['lat_ms']:.2f} ms CPU) serta mengintegrasikan "
             "<b>Stage 2 Three-Tier Clinical Layer</b> berbasis bukti demografis FDA FAERS (29.096 kasus), fungsi ginjal eGFR CKD-EPI, dan farmakogenomik CPIC.",
             callout_style
         )
@@ -262,9 +297,9 @@ def build_pdf(filename):
             Paragraph("<b>PharmaGNN</b> (Ours)", tb_pharma),
             Paragraph("Proposed Study (UMN)", tb_pharma),
             Paragraph("Enriched 2D Graph (RDKit)", tb_pharma),
-            Paragraph("<b>118k (815 KB ONNX)</b>", tb_pharma),
-            Paragraph("<b>~0.21 ms</b> (Single CPU)", tb_pharma),
-            Paragraph("<b>0.9493 / 0.7623</b>", tb_pharma),
+            Paragraph(f"<b>118k ({M['onnx_kb']:.0f} KB ONNX)</b>", tb_pharma),
+            Paragraph(f"<b>~{M['lat_ms']:.2f} ms</b> (Single CPU)", tb_pharma),
+            Paragraph(f"<b>{M['rnd_auroc']:.4f} / {M['cold_auroc']:.4f}</b>", tb_pharma),
             Paragraph("<b>Three-Tier Layer</b>", tb_pharma)
         ],
     ]
@@ -354,9 +389,9 @@ def build_pdf(filename):
             Paragraph("<b>PharmaGNN</b> (Ours)", tb_pharma),
             Paragraph("Proposed Study (UMN)", tb_pharma),
             Paragraph("<b>Zero DB (Cukup SMILES)</b>", tb_pharma),
-            Paragraph("<b><1 MB (815 KB ONNX)</b>", tb_pharma),
+            Paragraph(f"<b><1 MB ({M['onnx_kb']:.0f} KB ONNX)</b>", tb_pharma),
             Paragraph("<b>100% Berfungsi</b>", tb_pharma),
-            Paragraph("<b>0.7623</b>", tb_pharma),
+            Paragraph(f"<b>{M['cold_auroc']:.4f}</b>", tb_pharma),
             Paragraph("<b>100% Offline Ready</b>", tb_pharma)
         ],
     ]
@@ -434,7 +469,7 @@ def build_pdf(filename):
             Paragraph("<b>Enriched 2D Graph</b>", tb_pharma),
             Paragraph("<b>Dijamin Analitik</b>", tb_pharma),
             Paragraph("<b>Terjaga Sempurna</b>", tb_pharma),
-            Paragraph("<b>0.7623</b>", tb_pharma),
+            Paragraph(f"<b>{M['cold_auroc']:.4f}</b>", tb_pharma),
             Paragraph("<b>Three-Tier Layer</b>", tb_pharma)
         ],
     ]
@@ -526,16 +561,16 @@ def build_pdf(filename):
         ],
         [
             Paragraph("<b>PharmaGNN (Scaffold Split)</b>", tb_pharma),
-            Paragraph("<b>0.9493</b>", tb_pharma),
-            Paragraph("<b>0.6605 (Scaffold Disjoint)</b>", tb_pharma),
-            Paragraph("<b>-0.2888 (-30.4%)</b>", tb_pharma),
+            Paragraph(f"<b>{M['rnd_auroc']:.4f}</b>", tb_pharma),
+            Paragraph(f"<b>{M['scf_auroc']:.4f} (Scaffold Disjoint)</b>", tb_pharma),
+            Paragraph(f"<b>{-M['delta_scf']:.4f} ({-M['delta_scf']/M['rnd_auroc']*100:.1f}%)</b>", tb_pharma),
             Paragraph("Bukti transparan scaffold leakage", tb_pharma)
         ],
         [
             Paragraph("<b>PharmaGNN (Cold-Start Split)</b>", tb_pharma),
-            Paragraph("<b>0.9493</b>", tb_pharma),
-            Paragraph("<b>0.7623 (Unseen Drug Entity)</b>", tb_pharma),
-            Paragraph("<b>-0.1870 (-19.7%)</b>", tb_pharma),
+            Paragraph(f"<b>{M['rnd_auroc']:.4f}</b>", tb_pharma),
+            Paragraph(f"<b>{M['cold_auroc']:.4f} (Unseen Drug Entity)</b>", tb_pharma),
+            Paragraph(f"<b>{-M['delta_cold']:.4f} ({-M['delta_cold']/M['rnd_auroc']*100:.1f}%)</b>", tb_pharma),
             Paragraph("Kompetitif dengan SOTA Q1 dunia", tb_pharma)
         ],
     ]
@@ -621,7 +656,7 @@ def build_pdf(filename):
             "<b>STATUS VERIFIKASI CODEBASE & REPRODUKTIBILITAS:</b><br/>"
             "• <b>Unit Test Suite:</b> 50/50 test passing (100% green) pada <code>tests/test_full_suite.py</code>, <code>tests/test_pipeline.py</code> &amp; <code>tests/test_personalization_extended.py</code>.<br/>"
             "• <b>Presisi Numerik:</b> Deviasi PyTorch FP32 vs ONNX Runtime binary: <b>5.81 × 10<sup>-7</sup></b> (random split; lihat log parity per rezim).<br/>"
-            "• <b>Kelayakan Edge:</b> Ukuran model <b>815.4 KB</b> (ONNX FP32), latensi <b>~0.21 ms</b> di CPU biasa tanpa dependensi GPU (bench_onnx_latency.py).",
+            f"• <b>Kelayakan Edge:</b> Ukuran model <b>{M['onnx_kb']:.1f} KB</b> (ONNX FP32), latensi <b>~{M['lat_ms']:.2f} ms</b> di CPU biasa tanpa dependensi GPU (bench_onnx_latency.py).",
             callout_style
         )
     ]]
