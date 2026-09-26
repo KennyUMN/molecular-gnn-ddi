@@ -1,0 +1,20 @@
+{
+  "random": {
+    "model": "runs_kaggle/random/molecular_gnn_ddi.onnx",
+    "runs": 1000,
+    "single_thread_ms_per_pair": 0.2053,
+    "pairs_per_second": 4871.3
+  },
+  "scaffold": {
+    "model": "runs_kaggle/scaffold/molecular_gnn_ddi.onnx",
+    "runs": 1000,
+    "single_thread_ms_per_pair": 0.2092,
+    "pairs_per_second": 4779.4
+  },
+  "cold_start": {
+    "model": "runs_kaggle/cold_start/molecular_gnn_ddi.onnx",
+    "runs": 1000,
+    "single_thread_ms_per_pair": 0.2061,
+    "pairs_per_second": 4852.2
+  }
+}

@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# OS / editor
+.DS_Store
+*.textClipping
+
+# Large data & model binaries (kept on disk, not in git)
+data/*.csv
+data/drugbank.tab
+data/ChCh-Miner_durgbank-chem-chem.tsv
+*.pt
+*.onnx
+runs_kaggle/*/best_model.pt
+runs_kaggle/*/molecular_gnn_ddi.onnx
+runs_kaggle/logs/
+
+# kaggle raw dumps
+kaggle_artifacts/
