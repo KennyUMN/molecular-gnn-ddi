@@ -1,0 +1,412 @@
+{
+ "crediblemeds_qtc": {
+  "description": "CredibleMeds QTDrugs international reference list for drug-induced QT prolongation and Torsades de Pointes (TdP) risk stratification.",
+  "risk_categories": {
+   "conditional_risk": {
+    "description": "Drugs associated with TdP but only under certain conditions (e.g., excessive dose, hypokalemia, or when co-administered with a drug that inhibits its clearance).",
+    "drugs": [
+     "amitriptyline",
+     "citalopram",
+     "diphenhydramine",
+     "fluoxetine",
+     "furosemide",
+     "galantamine",
+     "hydrochlorothiazide",
+     "imipramine",
+     "indapamide",
+     "nortriptyline",
+     "paroxetine",
+     "sertraline",
+     "solifenacin",
+     "trazodone"
+    ],
+    "weight": 0.15
+   },
+   "known_risk": {
+    "description": "Drugs that prolong the QT interval and are clearly associated with a known risk of TdP, even when taken as recommended.",
+    "drugs": [
+     "amiodarone",
+     "azithromycin",
+     "ciprofloxacin",
+     "clarithromycin",
+     "disopyramide",
+     "dofetilide",
+     "dronedarone",
+     "erythromycin",
+     "fluconazole",
+     "haloperidol",
+     "ibutilide",
+     "levofloxacin",
+     "methadone",
+     "moxifloxacin",
+     "ondansetron",
+     "pentamidine",
+     "pimozide",
+     "procainamide",
+     "quinidine",
+     "sotalol",
+     "thioridazine"
+    ],
+    "weight": 0.35
+   },
+   "possible_risk": {
+    "description": "Drugs that can cause QT prolongation but currently lack substantial evidence of causing TdP when taken alone as recommended.",
+    "drugs": [
+     "atazanavir",
+     "bedaquiline",
+     "bortezomib",
+     "clozapine",
+     "crizotinib",
+     "dasatinib",
+     "donepezil",
+     "escitalopram",
+     "famotidine",
+     "fingolimod",
+     "granisetron",
+     "lapatinib",
+     "lithium",
+     "nilotinib",
+     "pazopanib",
+     "quetiapine",
+     "ranolazine",
+     "risperidone",
+     "sunitinib",
+     "tamoxifen",
+     "venlafaxine"
+    ],
+    "weight": 0.2
+   }
+  },
+  "source": "CredibleMeds / AZCERT (Arizona Center for Education and Research on Therapeutics)"
+ },
+ "faers_age": {
+  "fatal_outcome": {
+   "cells": {
+    "age_0_64__event": 1105,
+    "age_0_64__no_event": 8763,
+    "age_65_plus__event": 3133,
+    "age_65_plus__no_event": 16095
+   },
+   "ln_ror": 0.4339,
+   "n_reports_with_age": 29096,
+   "ror_age65_vs_0_64": 1.5433
+  },
+  "serious_outcome": {
+   "cells": {
+    "age_0_64__event": 8581,
+    "age_0_64__no_event": 1287,
+    "age_65_plus__event": 16157,
+    "age_65_plus__no_event": 3071
+   },
+   "ln_ror": -0.2367,
+   "n_reports_with_age": 29096,
+   "ror_age65_vs_0_64": 0.7892
+  }
+ },
+ "herbal_interactions": {
+  "description": "Herbal-Drug Interaction (HDI) and Indonesian Jamu dietary supplement interaction catalog.",
+  "herbals": {
+   "grapefruit": {
+    "active_constituents": [
+     "furanocoumarins",
+     "bergamottin",
+     "6',7'-dihydroxybergamottin"
+    ],
+    "clinical_risk": "Massive 3x-5x elevation of oral drug bioavailability for Simvastatin, Amlodipine, Tacrolimus",
+    "english_name": "Grapefruit juice",
+    "interacting_drug_classes": [
+     "statins",
+     "calcium_channel_blockers",
+     "immunosuppressants"
+    ],
+    "mechanism": "Mechanism-based irreversible suicide inhibition of intestinal epithelial CYP3A4 and P-gp",
+    "penalty_weight": 0.3,
+    "scientific_name": "Citrus paradisi"
+   },
+   "jahe": {
+    "active_constituents": [
+     "gingerols",
+     "shogaols"
+    ],
+    "clinical_risk": "Minor additive bleeding tendency at high medicinal doses (>4g/day) with Warfarin/Aspirin",
+    "english_name": "Ginger",
+    "interacting_drug_classes": [
+     "anticoagulants",
+     "antiplatelets"
+    ],
+    "mechanism": "Mild inhibition of thromboxane synthetase and platelet aggregation",
+    "penalty_weight": 0.1,
+    "scientific_name": "Zingiber officinale"
+   },
+   "kunyit": {
+    "active_constituents": [
+     "curcumin",
+     "demethoxycurcumin",
+     "bisdemethoxycurcumin"
+    ],
+    "clinical_risk": "Elevated systemic concentration of CYP3A4 substrates; additive bleeding risk with anticoagulants/NSAIDs",
+    "english_name": "Turmeric / Curcumin",
+    "interacting_drug_classes": [
+     "anticoagulants",
+     "antiplatelets",
+     "cyp3a4_substrates",
+     "statins"
+    ],
+    "mechanism": "Moderate CYP3A4 inhibition, P-gp transport inhibition, weak antiplatelet activity",
+    "penalty_weight": 0.15,
+    "scientific_name": "Curcuma longa"
+   },
+   "sambiloto": {
+    "active_constituents": [
+     "andrographolide",
+     "neoandrographolide"
+    ],
+    "clinical_risk": "Synergistic bleeding risk when taken with Warfarin, Aspirin, or Clopidogrel; additive hypotensive risk",
+    "english_name": "Green chiretta / King of Bitters",
+    "interacting_drug_classes": [
+     "anticoagulants",
+     "antiplatelets",
+     "antihypertensives"
+    ],
+    "mechanism": "Platelet aggregation inhibition via thromboxane pathway, mild CYP2C9 modulation",
+    "penalty_weight": 0.2,
+    "scientific_name": "Andrographis paniculata"
+   },
+   "st_johns_wort": {
+    "active_constituents": [
+     "hyperforin",
+     "hypericin"
+    ],
+    "clinical_risk": "Therapeutic failure and graft rejection with Cyclosporine/Tacrolimus, unplanned pregnancy, subtherapeutic INR",
+    "english_name": "St. John's Wort",
+    "interacting_drug_classes": [
+     "immunosuppressants",
+     "oral_contraceptives",
+     "anticoagulants",
+     "antiretrovirals"
+    ],
+    "mechanism": "Potent pregnane X receptor (PXR) activation causing massive CYP3A4, CYP2C9, and P-gp induction",
+    "penalty_weight": 0.3,
+    "scientific_name": "Hypericum perforatum"
+   }
+  },
+  "sources": [
+   "KNApSAcK Database (Indonesian Jamu and Natural Product Metabolomics)",
+   "Supp.AI (Allen Institute for AI - Dietary Supplements & Drug Interactions)",
+   "Natural Medicines Comprehensive Database / Stockley's Herbal Medicines"
+  ]
+ },
+ "pgx_allele_function": {
+  "CYP2C19": {
+   "*1": "normal",
+   "*10": "decreased",
+   "*11": "normal",
+   "*13": "normal",
+   "*15": "normal",
+   "*16": "decreased",
+   "*17": "increased",
+   "*18": "normal",
+   "*19": "decreased",
+   "*2": "no_function",
+   "*22": "no_function",
+   "*24": "no_function",
+   "*25": "decreased",
+   "*26": "decreased",
+   "*28": "normal",
+   "*3": "no_function",
+   "*35": "no_function",
+   "*36": "no_function",
+   "*37": "no_function",
+   "*38": "normal",
+   "*4": "no_function",
+   "*5": "no_function",
+   "*6": "no_function",
+   "*7": "no_function",
+   "*8": "no_function",
+   "*9": "decreased"
+  },
+  "CYP2C9": {
+   "*1": "normal",
+   "*11": "decreased",
+   "*12": "decreased",
+   "*13": "no_function",
+   "*14": "decreased",
+   "*15": "no_function",
+   "*16": "decreased",
+   "*2": "decreased",
+   "*23": "decreased",
+   "*24": "no_function",
+   "*25": "no_function",
+   "*26": "decreased",
+   "*28": "decreased",
+   "*29": "decreased",
+   "*3": "no_function",
+   "*30": "decreased",
+   "*31": "decreased",
+   "*33": "no_function",
+   "*35": "no_function",
+   "*37": "decreased",
+   "*38": "decreased",
+   "*39": "no_function",
+   "*4": "decreased",
+   "*42": "no_function",
+   "*43": "no_function",
+   "*44": "decreased",
+   "*45": "no_function",
+   "*46": "decreased",
+   "*5": "decreased",
+   "*50": "decreased",
+   "*52": "no_function",
+   "*55": "decreased",
+   "*6": "no_function",
+   "*61": "decreased",
+   "*8": "decreased",
+   "*9": "normal"
+  },
+  "CYP2D6": {
+   "*1": "normal",
+   "*10": "decreased",
+   "*100": "no_function",
+   "*101": "no_function",
+   "*109": "decreased",
+   "*10x2": "decreased",
+   "*11": "no_function",
+   "*114": "no_function",
+   "*119": "decreased",
+   "*12": "no_function",
+   "*120": "no_function",
+   "*124": "no_function",
+   "*129": "no_function",
+   "*13": "no_function",
+   "*13 + *1": "normal",
+   "*13 + *1x2": "increased",
+   "*13 + *2": "normal",
+   "*13 + *68x2 + *4": "no_function",
+   "*132": "decreased",
+   "*14": "decreased",
+   "*143": "no_function",
+   "*144": "no_function",
+   "*15": "no_function",
+   "*156": "no_function",
+   "*161": "no_function",
+   "*17": "decreased",
+   "*17x2": "normal",
+   "*18": "no_function",
+   "*19": "no_function",
+   "*1x2": "increased",
+   "*1xN": "increased",
+   "*1x\u22653": "increased",
+   "*2": "normal",
+   "*20": "no_function",
+   "*21": "no_function",
+   "*27": "normal",
+   "*27x2": "increased",
+   "*29": "decreased",
+   "*29x2": "normal",
+   "*2x2": "increased",
+   "*2xN": "increased",
+   "*2x\u22653": "increased",
+   "*3": "no_function",
+   "*31": "no_function",
+   "*32": "decreased",
+   "*33": "normal",
+   "*34": "normal",
+   "*35": "normal",
+   "*35x2": "increased",
+   "*35xN": "increased",
+   "*36": "no_function",
+   "*36 + *10": "decreased",
+   "*36 + *10x2": "decreased",
+   "*36x2": "no_function",
+   "*36x2 + *10": "decreased",
+   "*36x2 + *10x2": "decreased",
+   "*36xN": "no_function",
+   "*38": "no_function",
+   "*39": "normal",
+   "*3x2": "no_function",
+   "*3xN": "no_function",
+   "*4": "no_function",
+   "*40": "no_function",
+   "*41": "decreased",
+   "*41x2": "decreased",
+   "*41x3": "decreased",
+   "*42": "no_function",
+   "*44": "no_function",
+   "*45": "normal",
+   "*45x2": "increased",
+   "*45xN": "increased",
+   "*46": "normal",
+   "*47": "no_function",
+   "*48": "normal",
+   "*49": "decreased",
+   "*4x2": "no_function",
+   "*4xN": "no_function",
+   "*4x\u22653": "no_function",
+   "*5": "no_function",
+   "*50": "decreased",
+   "*51": "no_function",
+   "*52": "decreased",
+   "*53": "normal",
+   "*54": "decreased",
+   "*55": "decreased",
+   "*56": "no_function",
+   "*59": "decreased",
+   "*6": "no_function",
+   "*60": "no_function",
+   "*62": "no_function",
+   "*68": "no_function",
+   "*68 + *2": "normal",
+   "*68 + *4": "no_function",
+   "*68x2": "no_function",
+   "*69": "no_function",
+   "*6x2": "no_function",
+   "*6xN": "no_function",
+   "*7": "no_function",
+   "*8": "no_function",
+   "*81": "no_function",
+   "*9": "decreased",
+   "*91": "decreased",
+   "*92": "no_function",
+   "*96": "no_function",
+   "*99": "no_function",
+   "*9x2": "decreased"
+  },
+  "CYP3A4": {
+   "*1": "normal",
+   "*11": "decreased",
+   "*12": "decreased",
+   "*13": "decreased",
+   "*16": "decreased",
+   "*17": "decreased",
+   "*18": "decreased",
+   "*20": "no_function",
+   "*22": "decreased",
+   "*26": "no_function",
+   "*6": "no_function",
+   "*8": "decreased"
+  },
+  "HLA-B": {
+   "*15:02": "no_function",
+   "*57:01": "no_function",
+   "*58:01": "no_function"
+  },
+  "SLCO1B1": {
+   "*1": "normal",
+   "*15": "no_function",
+   "*17": "no_function",
+   "*1A": "normal",
+   "*1B": "normal",
+   "*37": "decreased",
+   "*5": "decreased"
+  }
+ },
+ "retrieved": "2026-09-22",
+ "sources": {
+  "crediblemeds_qtc": "CredibleMeds QTDrugs List (AZCERT 2026)",
+  "faers_age": "https://api.fda.gov/drug/event.json counts (pairs: warfarin+aspirin, warfarin+acetaminophen, warfarin+ibuprofen, simvastatin+amiodarone, clopidogrel+omeprazole, digoxin+amiodarone)",
+  "herbal_interactions": "KNApSAcK Jamu Database & Supp.AI",
+  "hla_b_cpic": "CPIC Guideline for Carbamazepine and HLA-B*15:02",
+  "pgx_allele_function": "https://api.clinpgx.org/v1/data/haplotype?gene.symbol=GENE (functionTerm, CPIC sourced)",
+  "slco1b1_cpcic": "CPIC Guideline for Statin-Associated Musculoskeletal Symptoms and SLCO1B1"
+ }
+}

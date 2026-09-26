@@ -1,0 +1,22 @@
+{
+  "Aspirin": "CC(=O)OC1=CC=CC=C1C(=O)O",
+  "Warfarin": "CC(=O)CC(C1=CC=CC=C1)C2=C(O)C3=CC=CC=C3OC2=O",
+  "Ibuprofen": "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O",
+  "Clopidogrel": "COC(=O)C(C1=CC=CC=C1Cl)N2CCC3=C(C2)C=CS3",
+  "Simvastatin": "CCC(C)(C)C(=O)OC1CC(C)C=C2C=CC(C)C(CCC3CC(O)CC(=O)O3)C12",
+  "Amiodarone": "CCCCC1=C(C(=O)C2=CC(I)=C(OCCN(CC)CC)C(I)=C2)C2=C(O1)C=CC=C2",
+  "Fluconazole": "OC(CN1C=NC=N1)(CN2C=NC=N2)C3=C(F)C=C(F)C=C3",
+  "Methotrexate": "CN(CC1=CN=C2C(=N1)C(=NC(=N2)N)N)C3=CC=C(C=C3)C(=O)NC(CCC(=O)O)C(=O)O",
+  "Nitroglycerin": "O=N(=O)OCC(CO[N+](=O)[O-])O[N+](=O)[O-]",
+  "Sildenafil": "CCCC1=NN(C)C2=C1N=C(NC2=O)C3=C(OCC)C=CC(=C3)S(=O)(=O)N4CCN(C)CC4",
+  "Lisinopril": "NCCCC[C@H](NC(=O)[C@H](CCC1=CC=CC=C1)NC(C)=O)C(=O)N2CCC[C@H]2C(=O)O",
+  "Metformin": "CN(C)C(=N)NC(=N)N",
+  "Omeprazole": "CC1=CN=C(CS(=O)C2=NC3=C(N2)C=CC(OC)=C3)C(=C1OC)C",
+  "Diazepam": "CN1C(=O)CN=C(C2=C1C=CC(=C2)Cl)C3=CC=CC=C3",
+  "Ciprofloxacin": "O=C(O)C1=CN(C2CC2)C3=CC(N4CCNCC4)=C(F)C=C3C1=O",
+  "Paracetamol": "CC(=O)NC1=CC=C(O)C=C1",
+  "Digoxin": "CC1OC(CC(O)C1O)OC2C(O)CC(OC3C(O)CC(OC4CCC5(C)C(CCC6C5CCC7(C)C(C8=CC(=O)OC8)CCC67O)C4)OC3C)OC2C",
+  "Diltiazem": "CC(=O)OC1C(SC2=CC=CC=C2N(CCN(C)C)C1=O)C3=CC=C(OC)C=C3",
+  "Tramadol": "CN(C)CC1CCCCC1(O)C2=CC(OC)=CC=C2",
+  "Furosemide": "NS(=O)(=O)C1=CC(C(=O)O)=C(NCC2=CC=CO2)C=C1Cl"
+}

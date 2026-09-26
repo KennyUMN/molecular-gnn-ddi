@@ -1,0 +1,55 @@
+{
+  "description": "Herbal-Drug Interaction (HDI) and Indonesian Jamu dietary supplement interaction catalog.",
+  "sources": [
+    "KNApSAcK Database (Indonesian Jamu and Natural Product Metabolomics)",
+    "Supp.AI (Allen Institute for AI - Dietary Supplements & Drug Interactions)",
+    "Natural Medicines Comprehensive Database / Stockley's Herbal Medicines"
+  ],
+  "herbals": {
+    "kunyit": {
+      "scientific_name": "Curcuma longa",
+      "english_name": "Turmeric / Curcumin",
+      "active_constituents": ["curcumin", "demethoxycurcumin", "bisdemethoxycurcumin"],
+      "mechanism": "Moderate CYP3A4 inhibition, P-gp transport inhibition, weak antiplatelet activity",
+      "penalty_weight": 0.15,
+      "interacting_drug_classes": ["anticoagulants", "antiplatelets", "cyp3a4_substrates", "statins"],
+      "clinical_risk": "Elevated systemic concentration of CYP3A4 substrates; additive bleeding risk with anticoagulants/NSAIDs"
+    },
+    "sambiloto": {
+      "scientific_name": "Andrographis paniculata",
+      "english_name": "Green chiretta / King of Bitters",
+      "active_constituents": ["andrographolide", "neoandrographolide"],
+      "mechanism": "Platelet aggregation inhibition via thromboxane pathway, mild CYP2C9 modulation",
+      "penalty_weight": 0.20,
+      "interacting_drug_classes": ["anticoagulants", "antiplatelets", "antihypertensives"],
+      "clinical_risk": "Synergistic bleeding risk when taken with Warfarin, Aspirin, or Clopidogrel; additive hypotensive risk"
+    },
+    "grapefruit": {
+      "scientific_name": "Citrus paradisi",
+      "english_name": "Grapefruit juice",
+      "active_constituents": ["furanocoumarins", "bergamottin", "6',7'-dihydroxybergamottin"],
+      "mechanism": "Mechanism-based irreversible suicide inhibition of intestinal epithelial CYP3A4 and P-gp",
+      "penalty_weight": 0.30,
+      "interacting_drug_classes": ["statins", "calcium_channel_blockers", "immunosuppressants"],
+      "clinical_risk": "Massive 3x-5x elevation of oral drug bioavailability for Simvastatin, Amlodipine, Tacrolimus"
+    },
+    "st_johns_wort": {
+      "scientific_name": "Hypericum perforatum",
+      "english_name": "St. John's Wort",
+      "active_constituents": ["hyperforin", "hypericin"],
+      "mechanism": "Potent pregnane X receptor (PXR) activation causing massive CYP3A4, CYP2C9, and P-gp induction",
+      "penalty_weight": 0.30,
+      "interacting_drug_classes": ["immunosuppressants", "oral_contraceptives", "anticoagulants", "antiretrovirals"],
+      "clinical_risk": "Therapeutic failure and graft rejection with Cyclosporine/Tacrolimus, unplanned pregnancy, subtherapeutic INR"
+    },
+    "jahe": {
+      "scientific_name": "Zingiber officinale",
+      "english_name": "Ginger",
+      "active_constituents": ["gingerols", "shogaols"],
+      "mechanism": "Mild inhibition of thromboxane synthetase and platelet aggregation",
+      "penalty_weight": 0.10,
+      "interacting_drug_classes": ["anticoagulants", "antiplatelets"],
+      "clinical_risk": "Minor additive bleeding tendency at high medicinal doses (>4g/day) with Warfarin/Aspirin"
+    }
+  }
+}

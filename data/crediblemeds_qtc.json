@@ -1,0 +1,35 @@
+{
+  "description": "CredibleMeds QTDrugs international reference list for drug-induced QT prolongation and Torsades de Pointes (TdP) risk stratification.",
+  "source": "CredibleMeds / AZCERT (Arizona Center for Education and Research on Therapeutics)",
+  "risk_categories": {
+    "known_risk": {
+      "weight": 0.35,
+      "description": "Drugs that prolong the QT interval and are clearly associated with a known risk of TdP, even when taken as recommended.",
+      "drugs": [
+        "amiodarone", "azithromycin", "ciprofloxacin", "clarithromycin", "disopyramide",
+        "dofetilide", "dronedarone", "erythromycin", "fluconazole", "haloperidol",
+        "ibutilide", "levofloxacin", "methadone", "moxifloxacin", "ondansetron",
+        "pentamidine", "pimozide", "procainamide", "quinidine", "sotalol", "thioridazine"
+      ]
+    },
+    "possible_risk": {
+      "weight": 0.20,
+      "description": "Drugs that can cause QT prolongation but currently lack substantial evidence of causing TdP when taken alone as recommended.",
+      "drugs": [
+        "atazanavir", "bedaquiline", "bortezomib", "clozapine", "crizotinib",
+        "dasatinib", "donepezil", "escitalopram", "famotidine", "fingolimod",
+        "granisetron", "lapatinib", "lithium", "nilotinib", "pazopanib",
+        "quetiapine", "ranolazine", "risperidone", "sunitinib", "tamoxifen", "venlafaxine"
+      ]
+    },
+    "conditional_risk": {
+      "weight": 0.15,
+      "description": "Drugs associated with TdP but only under certain conditions (e.g., excessive dose, hypokalemia, or when co-administered with a drug that inhibits its clearance).",
+      "drugs": [
+        "amitriptyline", "citalopram", "diphenhydramine", "fluoxetine", "furosemide",
+        "galantamine", "hydrochlorothiazide", "imipramine", "indapamide", "nortriptyline",
+        "paroxetine", "sertraline", "solifenacin", "trazodone"
+      ]
+    }
+  }
+}
