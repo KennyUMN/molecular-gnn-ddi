@@ -6,6 +6,10 @@
 > **Evaluation Weight:** 50% Final Grade  
 > **Authors:** Kenny Valent Winalda Sembiring & Team  
 
+[![Documentation PDF](https://img.shields.io/badge/Project%20Guide-PDF%20Download-0284C7?style=for-the-badge&logo=adobe-acrobat-reader)](PharmaGNN_Comprehensive_Project_Guide.pdf)
+[![Slide Deck PDF](https://img.shields.io/badge/Slides-PDF%20Deck-059669?style=for-the-badge&logo=adobe-acrobat-reader)](PharmaGNN_Progress_Presentation_Slides.pdf)
+[![Test Suite](https://img.shields.io/badge/Tests-54%20Passed-10B981?style=for-the-badge&logo=pytest)](tests/)
+
 ---
 
 ## 📌 Ringkasan Eksekutif & Pembaruan Arsitektur
@@ -111,12 +115,12 @@ molecular-gnn-ddi/
 │   ├── draft_manuscript.md              # Draf manuskrip publikasi IEEE / Scopus (dengan tabel komparasi Q1)
 │   └── scaffold_leakage_diagram.png     # Diagram bukti empiris scaffold leakage
 └── tests/
-    ├── test_full_suite.py               # Unit test (11 skenario)
-    ├── test_pipeline.py                 # Pengujian integrasi pipeline end-to-end (34 skenario)
+    ├── test_full_suite.py               # Unit test & overfit learning capacity (12 skenario)
+    ├── test_pipeline.py                 # Pengujian integrasi pipeline & adversarial (37 skenario)
     └── test_personalization_extended.py # Pengujian CredibleMeds QTc, Jamu, SLCO1B1 & HLA-B (5 skenario)
 ```
 
-> Total 50 skenario pengujian (`11 + 34 + 5`), semuanya lulus: `50 passed`.
+> Total 54 skenario pengujian (`12 + 37 + 5`), semuanya lulus: `54 passed in 4.46s`.
 
 ---
 
@@ -125,11 +129,8 @@ molecular-gnn-ddi/
 ### 1. Menjalankan Master Jupyter Notebook
 Buka dan eksekusi notebook utama:
 * Local: [`PharmaGNN_DDI_Master_Pipeline.ipynb`](PharmaGNN_DDI_Master_Pipeline.ipynb)
-* Downloads Mirror: [`/Users/kennyvws/Downloads/PharmaGNN_DDI_Master_Pipeline.ipynb`](file:///Users/kennyvws/Downloads/PharmaGNN_DDI_Master_Pipeline.ipynb)
 
-Notebook mencakup 15 bagian terstruktur: dari instalasi, ekstraksi fitur atom/ikatan RDKit, training model GATv2, personalisasi Tiered MIMIC-IV / PharmGKB, hingga klasifikasi fenotipik TwoSides dan polifarmasi HODDI.
-
-### 2. Menjalankan Unit Test (Verifikasi 50 Test)
+### 2. Menjalankan Unit Test (Verifikasi 54 Test Lulus 100%)
 ```bash
 # Menggunakan virtualenv Python 3.12 dengan PYTHONPATH
 PYTHONPATH=. .venv/bin/pytest tests/ -v
