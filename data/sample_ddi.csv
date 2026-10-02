@@ -1,0 +1,31 @@
+drug1_name,drug1_smiles,drug2_name,drug2_smiles,interaction,severity,description
+Warfarin,CC(=O)CC(C1=CC=CC=C1)C2=C(O)C3=CC=CC=C3OC2=O,Aspirin,CC(=O)OC1=CC=CC=C1C(=O)O,1,Major,Severe bleeding risk due to antiplatelet synergism and INR elevation
+Warfarin,CC(=O)CC(C1=CC=CC=C1)C2=C(O)C3=CC=CC=C3OC2=O,Ibuprofen,CC(C)CC1=CC=C(C=C1)C(C)C(=O)O,1,Major,Gastrointestinal bleeding and ulceration via COX-1 inhibition
+Simvastatin,CCC(C)(C)C(=O)OC1CC(C)C=C2C=CC(C)C(CCC3CC(O)CC(=O)O3)C12,Amiodarone,CCCCC1=C(C(=O)C2=CC(I)=C(OCCN(CC)CC)C(I)=C2)C2=C(O1)C=CC=C2,1,Major,Rhabdomyolysis and acute kidney failure via CYP3A4 inhibition
+Simvastatin,CCC(C)(C)C(=O)OC1CC(C)C=C2C=CC(C)C(CCC3CC(O)CC(=O)O3)C12,Fluconazole,OC(CN1C=NC=N1)(CN2C=NC=N2)C3=C(F)C=C(F)C=C3,1,Major,Marked increase in statin toxicity via strong CYP3A4 inhibition
+Sildenafil,CCCC1=NN(C)C2=C1N=C(NC2=O)C3=C(OCC)C=CC(=C3)S(=O)(=O)N4CCN(C)CC4,Nitroglycerin,O=N(=O)OCC(CO[N+](=O)[O-])O[N+](=O)[O-],1,Contraindicated,"Severe, life-threatening hypotension via synergistic cGMP vasodilation"
+Methotrexate,CN(CC1=CN=C2C(=N1)C(=NC(=N2)N)N)C3=CC=C(C=C3)C(=O)NC(CCC(=O)O)C(=O)O,Aspirin,CC(=O)OC1=CC=CC=C1C(=O)O,1,Major,Severe bone marrow suppression due to reduced renal excretion
+Methotrexate,CN(CC1=CN=C2C(=N1)C(=NC(=N2)N)N)C3=CC=C(C=C3)C(=O)NC(CCC(=O)O)C(=O)O,Ibuprofen,CC(C)CC1=CC=C(C=C1)C(C)C(=O)O,1,Major,NSAID toxicity and fatal methotrexate accumulation
+Clopidogrel,COC(=O)C(C1=CC=CC=C1Cl)N2CCC3=C(C2)C=CS3,Omeprazole,CC1=CN=C(CS(=O)C2=NC3=C(N2)C=CC(OC)=C3)C(=C1OC)C,1,Moderate,Decreased antiplatelet efficacy via CYP2C19 competitive inhibition
+Ciprofloxacin,O=C(O)C1=CN(C2CC2)C3=CC(N4CCNCC4)=C(F)C=C3C1=O,Diazepam,CN1C(=O)CN=C(C2=C1C=CC(=C2)Cl)C3=CC=CC=C3,1,Moderate,Elevated sedation and ataxia via CYP1A2 inhibition
+Digoxin,CC1OC(CC(O)C1O)OC2C(O)CC(OC3C(O)CC(OC4CCC5(C)C(CCC6C5CCC7(C)C(C8=CC(=O)OC8)CCC67O)C4)OC3C)OC2C,Amiodarone,CCCCC1=C(C(=O)C2=CC(I)=C(OCCN(CC)CC)C(I)=C2)C2=C(O1)C=CC=C2,1,Major,Digitalis toxicity and fatal arrhythmia via P-gp efflux inhibition
+Digoxin,CC1OC(CC(O)C1O)OC2C(O)CC(OC3C(O)CC(OC4CCC5(C)C(CCC6C5CCC7(C)C(C8=CC(=O)OC8)CCC67O)C4)OC3C)OC2C,Diltiazem,CC(=O)OC1C(SC2=CC=CC=C2N(CCN(C)C)C1=O)C3=CC=C(OC)C=C3,1,Moderate,Bradycardia and AV block via dual nodal slowing
+Tramadol,CN(C)CC1CCCCC1(O)C2=CC(OC)=CC=C2,Fluconazole,OC(CN1C=NC=N1)(CN2C=NC=N2)C3=C(F)C=C(F)C=C3,1,Moderate,Serotonin syndrome risk and respiratory depression
+Lisinopril,NCCCC[C@H](NC(=O)[C@H](CCC1=CC=CC=C1)NC(C)=O)C(=O)N2CCC[C@H]2C(=O)O,Ibuprofen,CC(C)CC1=CC=C(C=C1)C(C)C(=O)O,1,Moderate,Attenuated antihypertensive effect and worsening acute renal failure
+Furosemide,NS(=O)(=O)C1=CC(C(=O)O)=C(NCC2=CC=CO2)C=C1Cl,Lisinopril,NCCCC[C@H](NC(=O)[C@H](CCC1=CC=CC=C1)NC(C)=O)C(=O)N2CCC[C@H]2C(=O)O,1,Moderate,Excessive first-dose hypotension and hypovolemia
+Aspirin,CC(=O)OC1=CC=CC=C1C(=O)O,Ibuprofen,CC(C)CC1=CC=C(C=C1)C(C)C(=O)O,1,Moderate,Reduced cardioprotective antiplatelet effect of aspirin
+Amiodarone,CCCCC1=C(C(=O)C2=CC(I)=C(OCCN(CC)CC)C(I)=C2)C2=C(O1)C=CC=C2,Fluconazole,OC(CN1C=NC=N1)(CN2C=NC=N2)C3=C(F)C=C(F)C=C3,1,Major,QT prolongation and Torsades de Pointes arrhythmia
+Paracetamol,CC(=O)NC1=CC=C(O)C=C1,Aspirin,CC(=O)OC1=CC=CC=C1C(=O)O,0,None,No clinically significant pharmacokinetic interaction
+Metformin,CN(C)C(=N)NC(=N)N,Aspirin,CC(=O)OC1=CC=CC=C1C(=O)O,0,None,No significant adverse interaction under therapeutic dosing
+Omeprazole,CC1=CN=C(CS(=O)C2=NC3=C(N2)C=CC(OC)=C3)C(=C1OC)C,Paracetamol,CC(=O)NC1=CC=C(O)C=C1,0,None,Compatible co-administration
+Lisinopril,NCCCC[C@H](NC(=O)[C@H](CCC1=CC=CC=C1)NC(C)=O)C(=O)N2CCC[C@H]2C(=O)O,Paracetamol,CC(=O)NC1=CC=C(O)C=C1,0,None,Safe co-prescription for mild pain in hypertension
+Simvastatin,CCC(C)(C)C(=O)OC1CC(C)C=C2C=CC(C)C(CCC3CC(O)CC(=O)O3)C12,Metformin,CN(C)C(=N)NC(=N)N,0,None,Commonly prescribed complementary metabolic combination
+Digoxin,CC1OC(CC(O)C1O)OC2C(O)CC(OC3C(O)CC(OC4CCC5(C)C(CCC6C5CCC7(C)C(C8=CC(=O)OC8)CCC67O)C4)OC3C)OC2C,Paracetamol,CC(=O)NC1=CC=C(O)C=C1,0,None,No clinically notable pharmacokinetic interaction
+Ciprofloxacin,O=C(O)C1=CN(C2CC2)C3=CC(N4CCNCC4)=C(F)C=C3C1=O,Paracetamol,CC(=O)NC1=CC=C(O)C=C1,0,None,Standard safe analgesic pair with fluoroquinolone
+Clopidogrel,COC(=O)C(C1=CC=CC=C1Cl)N2CCC3=C(C2)C=CS3,Metformin,CN(C)C(=N)NC(=N)N,0,None,Safe cardiovascular and metabolic co-therapy
+Diazepam,CN1C(=O)CN=C(C2=C1C=CC(=C2)Cl)C3=CC=CC=C3,Metformin,CN(C)C(=N)NC(=N)N,0,None,No direct pharmacokinetic interference
+Aspirin,CC(=O)OC1=CC=CC=C1C(=O)O,Omeprazole,CC1=CN=C(CS(=O)C2=NC3=C(N2)C=CC(OC)=C3)C(=C1OC)C,0,Protective,Omeprazole protects gastric mucosa from aspirin-induced ulcers
+Tramadol,CN(C)CC1CCCCC1(O)C2=CC(OC)=CC=C2,Paracetamol,CC(=O)NC1=CC=C(O)C=C1,0,Synergistic,Beneficial multimodal analgesia (commercialized combination)
+Furosemide,NS(=O)(=O)C1=CC(C(=O)O)=C(NCC2=CC=CO2)C=C1Cl,Metformin,CN(C)C(=N)NC(=N)N,0,Minor,Safe with regular hydration and creatinine monitoring
+Fluconazole,OC(CN1C=NC=N1)(CN2C=NC=N2)C3=C(F)C=C(F)C=C3,Metformin,CN(C)C(=N)NC(=N)N,0,None,No significant metabolic interference
+Simvastatin,CCC(C)(C)C(=O)OC1CC(C)C=C2C=CC(C)C(CCC3CC(O)CC(=O)O3)C12,Aspirin,CC(=O)OC1=CC=CC=C1C(=O)O,0,Protective,Standard guideline-directed secondary cardiovascular prevention

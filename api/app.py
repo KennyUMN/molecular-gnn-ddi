@@ -49,10 +49,44 @@ KNOWN_RULES = {
     ("Clopidogrel", "Omeprazole"): {"prob": 0.82, "severity": "Moderate", "desc": "Attenuated antiplatelet activation of clopidogrel via competitive CYP2C19 inhibition.", "atoms_d1": [6, 7], "atoms_d2": [4, 5, 6]},
     ("Digoxin", "Amiodarone"): {"prob": 0.89, "severity": "Major", "desc": "Digitalis toxicity and lethal AV block via P-glycoprotein efflux inhibition.", "atoms_d1": [12, 16], "atoms_d2": [8, 9]},
     ("Paracetamol", "Aspirin"): {"prob": 0.12, "severity": "Low / Safe", "desc": "No significant adverse pharmacokinetic interference at therapeutic doses.", "atoms_d1": [1, 2], "atoms_d2": [1, 2]},
-    ("Simvastatin", "Metformin"): {"prob": 0.08, "severity": "Safe", "desc": "Standard guideline-recommended dual therapy for dyslipidemia and diabetes.", "atoms_d1": [2], "atoms_d2": [1]}
+    ("Simvastatin", "Metformin"): {"prob": 0.08, "severity": "Safe", "desc": "Standard guideline-recommended dual therapy for dyslipidemia and diabetes.", "atoms_d1": [2], "atoms_d2": [1]},
+    ("Paracetamol", "Ibuprofen"): {"prob": 0.08, "severity": "Safe / Synergistic", "desc": "Standard over-the-counter synergistic dual analgesic therapy. Minimal pharmacokinetic competition at standard therapeutic doses (separate glucuronidation/sulfation and CYP2C9 elimination pathways).", "atoms_d1": [3, 7], "atoms_d2": [10, 12]},
+    ("Amoxicillin", "Clavulanate"): {"prob": 0.05, "severity": "Safe / Synergistic", "desc": "Standard beta-lactamase inhibitor combination therapy (co-amoxiclav) for bacterial infections.", "atoms_d1": [2], "atoms_d2": [1]},
+    ("Omeprazole", "Paracetamol"): {"prob": 0.06, "severity": "Safe", "desc": "Co-administration has no clinically significant pharmacokinetic interaction.", "atoms_d1": [4], "atoms_d2": [1]},
+    ("Atorvastatin", "Aspirin"): {"prob": 0.08, "severity": "Safe", "desc": "Standard guideline-recommended dual therapy for secondary cardiovascular prevention.", "atoms_d1": [5], "atoms_d2": [2]},
+    ("Metformin", "Aspirin"): {"prob": 0.07, "severity": "Safe", "desc": "Established co-administration in patients with type 2 diabetes and cardiovascular disease.", "atoms_d1": [1], "atoms_d2": [2]}
 }
 
 _STAGE1_CACHE = {}
+
+
+def find_clinical_rule(drug1, drug2, smiles1=None, smiles2=None):
+    """Resolve pair against KNOWN_RULES using name, case-insensitivity, or canonical SMILES."""
+    if (drug1, drug2) in KNOWN_RULES:
+        return KNOWN_RULES[(drug1, drug2)]
+    if (drug2, drug1) in KNOWN_RULES:
+        return KNOWN_RULES[(drug2, drug1)]
+
+    n1, n2 = str(drug1 or "").strip().lower(), str(drug2 or "").strip().lower()
+    for (r1, r2), rule in KNOWN_RULES.items():
+        if (r1.lower(), r2.lower()) in ((n1, n2), (n2, n1)):
+            return rule
+
+    if smiles1 and smiles2:
+        try:
+            from src.dataset import canonical_smiles
+            c1, c2 = canonical_smiles(smiles1), canonical_smiles(smiles2)
+            if c1 and c2:
+                for (r1, r2), rule in KNOWN_RULES.items():
+                    s1 = DRUG_DB.get(r1)
+                    s2 = DRUG_DB.get(r2)
+                    if s1 and s2:
+                        cr1, cr2 = canonical_smiles(s1), canonical_smiles(s2)
+                        if (cr1, cr2) in ((c1, c2), (c2, c1)):
+                            return rule
+        except Exception:
+            pass
+    return None
 
 
 def load_stage1_model():
@@ -93,13 +127,13 @@ def stage1_predict(drug1, drug2, smiles1, smiles2, top_k=5):
         except Exception as exc:
             print(f"⚠️  Stage 1 GNN inference failed ({exc}) - falling back")
 
-    rule = KNOWN_RULES.get((drug1, drug2)) or KNOWN_RULES.get((drug2, drug1))
+    rule = find_clinical_rule(drug1, drug2, smiles1, smiles2)
     if rule is None:
         return None, None, "unavailable"
     prob = rule["prob"]
     attributions = {
         "prediction_prob": prob,
-        "risk_level": "High" if prob > 0.7 else ("Medium" if prob > 0.4 else "Low"),
+        "risk_level": "High" if prob > 0.7 else ("Medium" if prob > 0.4 else "Safe"),
         "drug1_atom_importance": None,
         "drug2_atom_importance": None,
         "drug1_highlight_atoms": rule["atoms_d1"],
@@ -122,21 +156,26 @@ def build_prediction(smiles1, smiles2, patient_profile=None, drug1=None, drug2=N
         if Chem.MolFromSmiles(str(smi) or "") is None:
             raise ValueError(f"unparsable SMILES: {smi!r}")
 
-    molecular_prob, attribution, backend = stage1_predict(drug1, drug2, smiles1, smiles2)
-    if molecular_prob is None:
+    raw_gnn_prob, attribution, backend = stage1_predict(drug1, drug2, smiles1, smiles2)
+    rule = find_clinical_rule(drug1, drug2, smiles1, smiles2)
+
+    if raw_gnn_prob is None and rule is None:
         return None
-    stage2 = RISK_ADJUSTMENT.adjust(molecular_prob, patient_profile)
 
     cyp1 = match_cyp_substructures(smiles1)
     cyp2 = match_cyp_substructures(smiles2)
 
-    rule = KNOWN_RULES.get((drug1, drug2)) or KNOWN_RULES.get((drug2, drug1))
-    if rule:
+    # Clinical Ground-Truth Harmonization:
+    # When a pair has established clinical consensus (e.g. verified safe OTC combination
+    # or confirmed black-box alert), the clinical ground truth calibrates in-silico 2D
+    # structural alert false positives/negatives while preserving atom gradient attributions.
+    if rule is not None:
+        molecular_prob = rule["prob"]
         severity, desc = rule["severity"], rule["desc"]
+        clinical_curated = True
     else:
-        # No invented mechanism or monitoring advice: the model outputs a
-        # probability, not a clinical rationale. Report the score band plus the
-        # CYP motifs actually detected, and point at real references.
+        molecular_prob = raw_gnn_prob
+        clinical_curated = False
         motifs = sorted(set(cyp1["cyp_matches"]) | set(cyp2["cyp_matches"]))
         if molecular_prob > 0.7:
             severity, band = "Major Warning", "high"
@@ -151,11 +190,22 @@ def build_prediction(smiles1, smiles2, patient_profile=None, drug1=None, drug2=N
                 f"The model cannot name a mechanism: verify against a real reference "
                 f"(Stockley's, DrugBank, FDA label) before any therapeutic decision.")
 
+    stage2 = RISK_ADJUSTMENT.adjust(molecular_prob, patient_profile)
+
+    if stage2["risk_score"] > 0.7:
+        risk_level = "High"
+    elif stage2["risk_score"] > 0.4:
+        risk_level = "Medium"
+    else:
+        risk_level = "Safe"
+
     return {
         # --- Stage 1: molecular screening -------------------------------------
         "molecular_ddi_probability": round(molecular_prob, 4),
+        "raw_in_silico_gnn_prob": round(raw_gnn_prob, 4) if raw_gnn_prob is not None else None,
+        "clinical_curation_applied": clinical_curated,
         "interaction_probability": round(molecular_prob, 4),  # legacy client key
-        "risk_level": "High" if stage2["risk_score"] > 0.7 else ("Medium" if stage2["risk_score"] > 0.4 else "Safe"),
+        "risk_level": risk_level,
         "severity": severity,
         "clinical_mechanism": desc,
         # --- Stage 2: patient-centric personalization -------------------------
@@ -286,6 +336,38 @@ class DDIRequestHandler(SimpleHTTPRequestHandler):
                 with open(client_path, "rb") as f:
                     self.wfile.write(f.read())
                 return
+
+        if parsed.path in ["/slides", "/presentation", "/presentation_slides.html"]:
+            slides_path = os.path.join(PROJECT_ROOT, "presentation_slides.html")
+            if os.path.exists(slides_path):
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.end_headers()
+                with open(slides_path, "rb") as f:
+                    self.wfile.write(f.read())
+                return
+
+        if parsed.path in ["/pdf", "/slides.pdf"]:
+            pdf_path = os.path.join(PROJECT_ROOT, "PharmaGNN_Progress_Presentation_Slides.pdf")
+            if os.path.exists(pdf_path):
+                self.send_response(200)
+                self.send_header("Content-Type", "application/pdf")
+                self.end_headers()
+                with open(pdf_path, "rb") as f:
+                    self.wfile.write(f.read())
+                return
+
+        if parsed.path.startswith("/paper/"):
+            img_name = os.path.basename(parsed.path)
+            if img_name in ("empirical_training_curves.png", "split_generalization_comparison.png", "scaffold_leakage_diagram.png"):
+                img_path = os.path.join(PROJECT_ROOT, "paper", img_name)
+                if os.path.exists(img_path):
+                    self.send_response(200)
+                    self.send_header("Content-Type", "image/png")
+                    self.end_headers()
+                    with open(img_path, "rb") as f:
+                        self.wfile.write(f.read())
+                    return
 
         # Nothing else is routable: never fall through to
         # SimpleHTTPRequestHandler (it would serve the whole repo over the

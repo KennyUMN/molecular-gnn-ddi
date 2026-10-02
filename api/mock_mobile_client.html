@@ -161,10 +161,16 @@
 <body>
 
 <header>
-  <h1>PHARMAGNN / DDI SCREENER</h1>
-  <span class="meta">GATv2 + cross-attention &middot; 118,021 params &middot; PyTorch FP32</span>
+  <div>
+    <h1>PHARMAGNN / DDI SCREENER</h1>
+    <span class="meta">GATv2 + Cross-Attention &middot; 118,021 params &middot; Stage 1 Chemical + Stage 2 Clinical</span>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <a href="/slides" target="_blank" style="color:var(--paper);background:var(--acc);padding:5px 10px;text-decoration:none;font-weight:700;font-size:11px;">🖥️ BUKA SLIDE PRESENTASI</a>
+    <a href="/pdf" target="_blank" style="color:var(--ink);background:var(--bg);padding:5px 10px;text-decoration:none;font-weight:700;font-size:11px;border:1px solid var(--paper)">📄 UNDUH PDF SLIDES</a>
+  </div>
 </header>
-<div class="strip">MODEL: random split &middot; TEST AUROC 0.9532 &middot; AUPRC 0.9522 &middot; TDC DrugBank 382,804 pairs (191,402 positif + 191,402 negatif sampled)</div>
+<div class="strip">MODEL: random split &middot; TEST AUROC 0.9493 &middot; AUPRC 0.9482 &middot; TDC DrugBank 382,804 pairs &middot; ONNX FP32 815 KB &middot; CPU Latensi 1.71 ms</div>
 
 <main>
   <section id="form">
@@ -185,30 +191,48 @@
     </div>
 
     <details id="patBox" style="margin-bottom:16px">
-      <summary style="cursor:pointer;font-size:11px;font-weight:700;text-transform:uppercase;border:1px solid var(--ink);padding:8px;background:var(--paper)">Profil pasien (opsional &middot; Stage 2)</summary>
+      <summary style="cursor:pointer;font-size:11px;font-weight:700;text-transform:uppercase;border:1px solid var(--ink);padding:8px;background:var(--paper)">Profil pasien (opsional &middot; Stage 2 Personalization)</summary>
       <div style="border:1px solid var(--ink);border-top:none;padding:12px">
         <div class="field">
           <label for="pAge">Usia (tahun)</label>
-          <input type="text" id="pAge" placeholder="mis. 71 &middot; kosongkan jika tidak tahu">
+          <input type="text" id="pAge" placeholder="mis. 71 &middot; penalti geriatri FAERS ROR = 1.5433">
         </div>
         <div class="field">
           <label><input type="checkbox" id="pPreg"> Sedang hamil</label>
-          <label style="margin-top:7px"><input type="checkbox" id="pHep"> Riwayat gangguan hepar / tukak / komorbiditas</label>
+          <label style="margin-top:7px"><input type="checkbox" id="pHep"> Riwayat gangguan hepar / komorbiditas berat</label>
         </div>
         <div class="field">
           <label for="pEgfr">eGFR (mL/min/1.73m&sup2;)</label>
-          <input type="text" id="pEgfr" placeholder="mis. 38 (CKD 3b) &middot; normal ~90+">
+          <input type="text" id="pEgfr" placeholder="mis. 38 (CKD 3b) &middot; formula CKD-EPI 2021">
         </div>
         <div class="field">
-          <label for="pGeno">Genotipe CYP450</label>
-          <input type="text" id="pGeno" list="dlG" placeholder="mis. CYP2C9 *2/*3">
+          <label for="pGeno">Genotipe CYP450 / Transporter PGx</label>
+          <input type="text" id="pGeno" list="dlG" placeholder="mis. CYP2C9 *2/*3 atau SLCO1B1 *5/*5">
           <datalist id="dlG">
             <option value="CYP2C9 *2/*3"></option>
             <option value="CYP2C19 *2/*2"></option>
             <option value="CYP2D6 *4/*4"></option>
             <option value="CYP3A4 *22/*22"></option>
+            <option value="SLCO1B1 *5/*5"></option>
+            <option value="HLA-B*15:02"></option>
           </datalist>
-          <p class="hint">Bucket dari tabel fungsi alel CPIC: poor metabolizer delta_pgx +0.45, intermediate +0.225. Semua dikosongkan = Tier 1, skor murni kimia.</p>
+          <p class="hint">CPIC Level 1A: poor metabolizer delta_pgx +0.45, intermediate +0.225, SLCO1B1 statin myopathy, HLA-B*15:02 SJS alert.</p>
+        </div>
+        <div class="field">
+          <label for="pQtc">Baseline EKG QTc Interval (ms)</label>
+          <input type="text" id="pQtc" placeholder="mis. 480 &middot; threshold risiko &ge; 470 ms (CredibleMeds)">
+        </div>
+        <div class="field">
+          <label for="pHerbal">Konsumsi Jamu / Herbal / Suplemen</label>
+          <input type="text" id="pHerbal" list="dlH" placeholder="mis. Kunyit (Curcumin), Sambiloto, Jahe, Grapefruit">
+          <datalist id="dlH">
+            <option value="Kunyit"></option>
+            <option value="Sambiloto"></option>
+            <option value="Jahe"></option>
+            <option value="Grapefruit"></option>
+            <option value="St. John's Wort"></option>
+          </datalist>
+          <p class="hint">Modulasi metabolik CYP3A4 / P-gp dari basis data KNApSAcK & Supp.AI.</p>
         </div>
       </div>
     </details>
@@ -220,7 +244,7 @@
   <section id="result">
     <div class="pairline"><span id="pairName">...</span><span id="badge" class="badge">MENUNGGU</span></div>
     <div class="bignum" id="prob">--</div>
-    <div class="hint">PROBABILITAS INTERAKSI (DDI)</div>
+    <div class="hint" id="probHint">PROBABILITAS INTERAKSI (DDI)</div>
     <div class="hint" id="persLine" style="display:none;margin:8px 0 12px;border:1px solid var(--ink);padding:8px;background:var(--paper)"></div>
     <p class="mech" id="mech">Pilih dua obat lalu tekan screen.</p>
 
@@ -303,6 +327,10 @@ function buildProfile() {
   if (egfr !== null && !Number.isNaN(egfr)) p.egfr = egfr;
   const g = document.getElementById("pGeno").value.trim();
   if (g) p.cyp_genotype = g;
+  const qtc = num("pQtc");
+  if (qtc !== null && !Number.isNaN(qtc)) p.baseline_qtc_ms = qtc;
+  const herbal = document.getElementById("pHerbal").value.trim();
+  if (herbal) p.herbal_supplements = [herbal];
   return Object.keys(p).length ? p : null;  // empty form = Tier 1 passthrough
 }
 
@@ -356,17 +384,28 @@ async function screen() {
     prob.className = "bignum " + lc;
     prob.textContent = (d.molecular_ddi_probability * 100).toFixed(1) + "%";
 
+    const curPill = d.clinical_curation_applied && d.raw_in_silico_gnn_prob
+      ? ` &middot; <span style="color:var(--ok);font-weight:700">TERKALIBRASI KLINIS (GNN 2D raw: ${(d.raw_in_silico_gnn_prob*100).toFixed(1)}%)</span>`
+      : "";
+    document.getElementById("probHint").innerHTML = "PROBABILITAS INTERAKSI (DDI)" + curPill;
+
     document.getElementById("mech").textContent = d.clinical_mechanism;
     document.getElementById("mPers").textContent = (d.personalized_risk_score * 100).toFixed(1) + "%";
     document.getElementById("mTier").textContent = "tier " + d.tier_applied;
     document.getElementById("mLat").textContent = d.inference_latency_ms;
-    document.getElementById("mBack").textContent = d.stage1_backend;
+    document.getElementById("mBack").textContent = d.clinical_curation_applied ? "curated_clinical" : d.stage1_backend;
 
     const pl = document.getElementById("persLine");
     if (d.tier_applied > 1) {
       const rd = d.risk_deltas || {};
       const parts = [];
-      for (const [k, label] of [["delta_demo", "demo"], ["delta_renal", "renal"], ["delta_pgx", "pgx"]]) {
+      for (const [k, label] of [
+        ["delta_demo", "demo"],
+        ["delta_renal", "renal"],
+        ["delta_pgx", "pgx"],
+        ["delta_cardiac", "cardiac (QTc)"],
+        ["delta_herbal", "herbal/jamu"]
+      ]) {
         if (rd[k]) parts.push(label + " +" + rd[k].toFixed(2));
       }
       const factors = Object.keys(d.patient_factors_used || {}).join(", ");

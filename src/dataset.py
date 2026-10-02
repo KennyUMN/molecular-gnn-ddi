@@ -85,14 +85,15 @@ _MISSING = object()
 
 
 def smiles_to_graph(smiles):
-    """RDKit SMILES -> graph. Raises on missing RDKit or unparsable input.
+    """RDKit SMILES -> graph. Raises on missing RDKit, unparsable, or empty input.
 
     No silent fallback parser: a fabricated chain graph looks like data and
     poisons training, and an environment without RDKit must never 'succeed'
     on fake molecules (audit finding: silent failure)."""
     from rdkit import Chem  # ImportError propagates: RDKit is a hard requirement
-    if Chem.MolFromSmiles(smiles or "") is None:
-        raise ValueError(f"unparsable SMILES: {smiles!r}")
+    mol = Chem.MolFromSmiles(smiles or "")
+    if mol is None or mol.GetNumAtoms() == 0:
+        raise ValueError(f"unparsable or empty SMILES: {smiles!r}")
     return smiles_to_graph_rdkit(smiles)
 
 
@@ -348,7 +349,11 @@ def ecfp4_matrix(df, n_bits=1024, radius=2):
         f1, f2 = fp(r["drug1_smiles"]), fp(r["drug2_smiles"])
         if f1 is None or f2 is None:
             continue
-        rows.append(np.concatenate([f1, f2]))
+        # Commutative pair representation: elementwise product (f1 * f2) and
+        # absolute difference (|f1 - f2|). Since f1, f2 in {0, 1}^D:
+        # f1 * f2 is bitwise AND, |f1 - f2| is bitwise XOR. Both operations are
+        # mathematically commutative, guaranteeing X(A, B) == X(B, A).
+        rows.append(np.concatenate([f1 * f2, np.abs(f1 - f2)]))
         ys.append(r["interaction"])
     dropped = len(df) - len(rows)
     if dropped:

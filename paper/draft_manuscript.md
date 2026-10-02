@@ -100,6 +100,12 @@ Under transductive random split, PharmaGNN achieves an AUROC of **0.9493** and A
 
 Under the inductive cold-start split, PharmaGNN achieves an AUROC of **0.7623**, matching established benchmarks (GMPNN-CS: 0.7748; SA-DDI: 0.7914; TDC average: 0.6480), demonstrating that $K=4$ substructure cross-attention successfully learns transferable chemical motifs.
 
+![Figure 1: Empirical Training Loss and AUROC Trajectories](empirical_training_curves.png)
+*Figure 1: Validation loss trajectories (left) and AUROC convergence curves (right) across the three evaluation regimes.*
+
+![Figure 2: The Generalization Cliff](split_generalization_comparison.png)
+*Figure 2: Comparative test AUROC drop between transductive random split and inductive cold-start/scaffold-disjoint splits across top-tier models and PharmaGNN.*
+
 ### B. Computational Efficiency & Edge Readiness
 PharmaGNN requires only **118,021 parameters**, yielding an **815.4 KB ONNX FP32 binary** with a maximum numerical divergence of $5.81 \times 10^{-7}$ against native PyTorch. Mean single-thread ONNX Runtime CPU latency is **~0.21 ms** per drug pair. Unlike 3DGT-DDI, which requires conformer force-field optimization (>1.0 s per pair), or Decagon/EmerGNN, which require multi-gigabyte resident graphs, PharmaGNN runs entirely client-side on mobile devices.
 

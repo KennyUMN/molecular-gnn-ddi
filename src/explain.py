@@ -215,8 +215,9 @@ def explain_ddi_interaction(model, g1, g2, top_k=3):
     out = model(g1_clone, g2_clone)
     prob = out['prob']
     # Backprop the pre-sigmoid logit: sigmoid saturation kills the gradient
-    # exactly when the model is confident (audit finding).
-    out['logits'].backward()
+    # exactly when the model is confident (audit finding). Use .sum() so it is
+    # robust across both scalar logits and batched tensor shapes.
+    out['logits'].sum().backward()
 
     # Atom-level saliency: L2 norm of feature gradients
     saliency_1 = x1.grad.norm(dim=-1).detach().cpu().numpy()

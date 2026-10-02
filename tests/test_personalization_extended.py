@@ -82,6 +82,42 @@ class TestExtendedPersonalization(unittest.TestCase):
         self.assertGreater(res["delta_herbal"], 0)
         self.assertGreater(res["risk_score"], 0.65)
 
+    def test_otc_safe_pairs_false_positive_elimination(self):
+        """Paracetamol + Ibuprofen, Paracetamol + Aspirin, and Simvastatin + Metformin
+        must be classified as Safe despite in-silico 2D reactive alerts."""
+        from api.app import build_prediction, DRUG_DB
+
+        # 1. Paracetamol + Ibuprofen
+        res_pi = build_prediction(
+            DRUG_DB["Paracetamol"], DRUG_DB["Ibuprofen"],
+            drug1="Paracetamol", drug2="Ibuprofen"
+        )
+        self.assertEqual(res_pi["severity"], "Safe / Synergistic")
+        self.assertEqual(res_pi["risk_level"], "Safe")
+        self.assertLessEqual(res_pi["molecular_ddi_probability"], 0.10)
+        self.assertTrue(res_pi["clinical_curation_applied"])
+        self.assertGreater(res_pi["raw_in_silico_gnn_prob"], 0.50)  # proved raw GNN had false positive, but was corrected!
+
+        # 2. Paracetamol + Aspirin
+        res_pa = build_prediction(
+            DRUG_DB["Paracetamol"], DRUG_DB["Aspirin"],
+            drug1="Paracetamol", drug2="Aspirin"
+        )
+        self.assertEqual(res_pa["severity"], "Low / Safe")
+        self.assertEqual(res_pa["risk_level"], "Safe")
+        self.assertLessEqual(res_pa["molecular_ddi_probability"], 0.15)
+        self.assertTrue(res_pa["clinical_curation_applied"])
+
+        # 3. Simvastatin + Metformin
+        res_sm = build_prediction(
+            DRUG_DB["Simvastatin"], DRUG_DB["Metformin"],
+            drug1="Simvastatin", drug2="Metformin"
+        )
+        self.assertEqual(res_sm["severity"], "Safe")
+        self.assertEqual(res_sm["risk_level"], "Safe")
+        self.assertLessEqual(res_sm["molecular_ddi_probability"], 0.10)
+        self.assertTrue(res_sm["clinical_curation_applied"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -10,6 +10,7 @@ __pycache__/
 
 # Large data & model binaries (kept on disk, not in git)
 data/*.csv
+!data/sample_ddi.csv
 data/drugbank.tab
 data/ChCh-Miner_durgbank-chem-chem.tsv
 *.pt
@@ -17,6 +18,8 @@ data/ChCh-Miner_durgbank-chem-chem.tsv
 runs_kaggle/*/best_model.pt
 runs_kaggle/*/molecular_gnn_ddi.onnx
 runs_kaggle/logs/
+models/*.pt
+models/*.onnx
 
 # kaggle raw dumps
 kaggle_artifacts/
