@@ -93,6 +93,33 @@ class TestModelSymmetry(unittest.TestCase):
         self.assertLess(diff_probs, 1e-5, f"Probability asymmetry: {diff_probs}")
 
 
+class TestModelLearning(unittest.TestCase):
+    def test_overfit_small_batch(self):
+        """Model must be able to overfit a small 4-pair batch to prove gradient flow and learning capacity."""
+        torch.manual_seed(42)
+        model = MolecularGNN_DDI(in_atom_features=24, hidden_dim=64, num_substructures=4)
+        model.train()
+        df = pd.read_csv("data/sample_ddi.csv")
+        ds = DDIDataset(df.iloc[:4])
+        batch = collate_ddi_batch([ds[i] for i in range(4)])
+        optimizer = torch.optim.AdamW(model.parameters(), lr=0.01)
+        criterion = torch.nn.BCEWithLogitsLoss()
+
+        initial_loss = None
+        for step in range(30):
+            optimizer.zero_grad()
+            out = model(batch["d1"], batch["d2"])
+            loss = criterion(out["logits"], batch["labels"])
+            if initial_loss is None:
+                initial_loss = loss.item()
+            loss.backward()
+            optimizer.step()
+
+        final_loss = loss.item()
+        self.assertLess(final_loss, initial_loss * 0.35,
+                        f"Model failed to overfit small batch: init={initial_loss:.4f}, final={final_loss:.4f}")
+
+
 class TestExplainabilityAndAttributionDrift(unittest.TestCase):
     def test_cyp_substructures(self):
         """Aspirin contains CYP2C9 benzoic acid/carboxylate; Warfarin contains coumarin core."""

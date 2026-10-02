@@ -344,6 +344,51 @@ class TestAuditRegressions(unittest.TestCase):
         with self.assertRaises(ValueError):
             build_prediction("CCO", "CCN", patient_profile="oops", drug1="A", drug2="B")
 
+    def test_adversarial_and_edge_inputs(self):
+        """Adversarial and unusual inputs: empty SMILES, single-atom ions, disconnected salts."""
+        from src.dataset import smiles_to_graph, collate_ddi_batch
+        from src.model import MolecularGNN_DDI
+
+        # 1. Empty SMILES must raise ValueError
+        with self.assertRaises(ValueError):
+            smiles_to_graph("")
+        with self.assertRaises(ValueError):
+            smiles_to_graph("   ")
+
+        # 2. Single-atom ion [Na+] and [Cl-] must produce valid graphs
+        g_na = smiles_to_graph("[Na+]")
+        g_cl = smiles_to_graph("[Cl-]")
+        self.assertEqual(g_na["num_nodes"], 1)
+        self.assertEqual(g_na["edge_index"].shape, (2, 0))
+
+        # 3. Disconnected salt [Na+].[Cl-] must produce valid graph
+        g_salt = smiles_to_graph("[Na+].[Cl-]")
+        self.assertEqual(g_salt["num_nodes"], 2)
+        self.assertEqual(g_salt["edge_index"].shape, (2, 0))
+
+        # 4. GNN forward on single-atom and disconnected salt must produce valid finite probabilities
+        model = MolecularGNN_DDI(in_atom_features=24, hidden_dim=64, num_gnn_layers=3).eval()
+        b_salt = collate_ddi_batch([{
+            "d1_name": "Salt", "d2_name": "Aspirin",
+            "d1_graph": g_salt, "d2_graph": smiles_to_graph(SMILES_A),
+            "label": torch.tensor(0.0)
+        }])
+        with torch.no_grad():
+            out_salt = model(b_salt["d1"], b_salt["d2"])
+            prob = out_salt["prob"].item()
+            self.assertTrue(0.0 <= prob <= 1.0)
+            self.assertFalse(np.isnan(prob))
+
+    def test_ecfp4_commutativity_invariant(self):
+        """Baseline ECFP4 matrix must be strictly commutative: X(A, B) == X(B, A)."""
+        import pandas as pd
+        from src.dataset import ecfp4_matrix
+        df_ab = pd.DataFrame([{"drug1_smiles": SMILES_A, "drug2_smiles": SMILES_B, "interaction": 1}])
+        df_ba = pd.DataFrame([{"drug1_smiles": SMILES_B, "drug2_smiles": SMILES_A, "interaction": 1}])
+        x_ab, y_ab = ecfp4_matrix(df_ab)
+        x_ba, y_ba = ecfp4_matrix(df_ba)
+        self.assertEqual(float(np.abs(x_ab - x_ba).max()), 0.0)
+
 
 class TestAPIContract(unittest.TestCase):
     def test_predict_response_keys(self):

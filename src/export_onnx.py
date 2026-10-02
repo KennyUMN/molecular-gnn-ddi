@@ -50,14 +50,20 @@ def load_trained_model(model_checkpoint_path="models/best_model.pt", hidden_dim=
     return model
 
 
-def emulate_int8_weights(model, per_channel=True):
-    """In-place weight-only INT8 emulation (symmetric, per-output-channel).
+def emulate_int8_weights(model, per_channel=True, in_place=False):
+    """Weight-only INT8 emulation (symmetric, per-output-channel).
 
     Mirrors what onnxruntime.quantization.quantize_dynamic does to MatMul/Gemm
     weights, so the attribution drift measured in torch matches the exported
     INT8 binary. ponytail: matmul weights only (dim >= 2), activations stay
     FP32 — that is exactly the dynamic-quantization scheme, not a shortcut.
+
+    By default (in_place=False), deep-copies the model to preserve caller weights.
     """
+    if not in_place:
+        import copy
+        model = copy.deepcopy(model)
+
     with torch.no_grad():
         for param in model.parameters():
             if param.dim() < 2:

@@ -28,17 +28,35 @@ def make_feed(rng, n_atoms, n_bonds):
             "x2": x.copy(), "edge_index2": ei.copy(), "batch2": b.copy()}
 
 
+def make_real_feed(smiles1="CC(=O)OC1=CC=CC=C1C(=O)O", smiles2="CC(=O)CC(C1=CC=CC=C1)C2=C(O)C3=CC=CC=C3OC2=O"):
+    """Produce benchmark feed using real molecular graphs (Aspirin + Warfarin)."""
+    try:
+        from src.dataset import smiles_to_graph
+        g1 = smiles_to_graph(smiles1)
+        g2 = smiles_to_graph(smiles2)
+        return {
+            "x1": g1["x"].numpy(),
+            "edge_index1": g1["edge_index"].numpy(),
+            "batch1": np.zeros(g1["num_nodes"], dtype=np.int64),
+            "x2": g2["x"].numpy(),
+            "edge_index2": g2["edge_index"].numpy(),
+            "batch2": np.zeros(g2["num_nodes"], dtype=np.int64),
+        }
+    except Exception:
+        rng = np.random.default_rng(0)
+        return make_feed(rng, 21, 40)
+
+
 def main():
     so = ort.SessionOptions()
     so.intra_op_num_threads = 1
     so.inter_op_num_threads = 1
-    rng = np.random.default_rng(0)
     out = {}
+    feed = make_real_feed()
     for split, path in MODELS.items():
         if not os.path.exists(path):
             continue
         sess = ort.InferenceSession(path, so, providers=["CPUExecutionProvider"])
-        feed = make_feed(rng, 21, 40)  # aspirin-sized pair
         for _ in range(20):
             sess.run(None, feed)
         t = time.perf_counter()

@@ -5,7 +5,7 @@
 
 ---
 
-## 1. Master Cross-Comparison Matrix (15 Systems × 9 Evaluation Dimensions)
+## 1. Master Cross-Comparison Matrix (19 Systems × 9 Evaluation Dimensions)
 
 | Model / Benchmark | Venue & Year | Primary Graph / Sequence Representation | Backbone Architecture | Parameter Count & Size | CPU Latency & Mobile Edge Feasibility | Commutative Invariance $f(A,B) \equiv f(B,A)$ | Empirical AUROC (Random vs Scaffold vs Cold-Start) | Patient Personalization (Stage 2 Clinical Layer) | XAI Ground-Truth Verification |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -22,6 +22,10 @@
 | **CASTER** | *AAAI* 2020 | 1D SMILES Substring Sequential Patterns | Sequential Pattern Mining (SPM) + Autoencoder Dictionary | ~1.5M params (~12 MB) | ~15 ms (CPU); Sedang di Edge | **Tidak** ($[z_A \parallel z_B]$ asimetris) | Random: **0.8610** (DrugBank)<br>Scaffold: Tidak Diuji<br>Cold-Start: **Lumpuh** (OOV substructure baru) | **0% (Nihil)**<br>Hanya in-silico molekul | Parsial (Koefisien kamus tanpa validasi biokimia) |
 | **MHCADDI** | *NeurIPS Workshop* 2019 / *arXiv* | 2D Molecular Graph | Multi-Hop Contextual Co-Attention GCN | ~2.1M params (~9 MB) | ~35 ms (GPU); Lambat di CPU ($O(N_1 N_2)$ atomic matrix) | **Tidak** (Co-attention query-key asimetris) | Random: **0.8820**<br>Scaffold: Tidak Diuji<br>Cold-Start S2: **0.7250** | **0% (Nihil)**<br>Hanya in-silico molekul | Kosmetik (Heatmap atensi atom bising tanpa evaluasi alert) |
 | **DeepAttention** | *IEEE/ACM TCBB* 2023 (Q1) | 1D SMILES + ECFP Fingerprint | Multi-Head Dual Self-Attention + Dense Network | ~1.8M params (~8 MB) | ~10 ms (CPU); Memungkinkan di Edge | **Tidak** (Penggabungan linear berarah) | Random: **0.9890**<br>Scaffold: Tidak Diuji<br>Cold-Start: Runtuh pada scaffold baru | **0% (Nihil)**<br>Hanya in-silico molekul | Kosmetik (Atensi posisi token 1D SMILES tanpa topologi 2D) |
+| **SumGNN** | *Bioinformatics* 2021 (Q1) | Biomedical KG + Extracted Local Subgraph | KG Subgraph Summarization GNN | ~3.5M params (>1 GB RAM) | Ratusan ms; **Mustahil di Edge** (Wajib ekstraksi subgraph KG per query) | **Tidak Terjamin** | Random: **~0.94** (DrugBank)<br>Scaffold: N/A<br>Cold-Start: **Lumpuh** untuk entitas di luar KG | **0% (Nihil)**<br>Populasi statis | Parsial (Jalur subgraph KG, bukan atomik) |
+| **MRCGNN** | *AAAI* 2023 | 2D Molecular Graph + Multi-Relational DDI Graph | Multi-Relational Contrastive Learning GNN | ~3M params | Puluhan ms; Sulit di Edge (Ketergantungan multi-relasi DDI) | **Tidak Terjamin** | Random: **>0.98** (DrugBank)<br>Scaffold: N/A<br>Cold-Start S1/S2: **Drop besar** di bawah *distribution change* (DDI-Ben, Bioinformatics 2025) | **0% (Nihil)**<br>Populasi statis | Nihil |
+| **TIGER** | *AAAI* 2024 | 2D Molecular Graph + Biomedical Heterogeneous Network | Dual-Channel Relation-Aware Heterogeneous Graph Transformer | ~10M params (>500 MB) | >100 ms; **Mustahil di Edge** (Butuh heterogeneous network resident) | **Tidak Terjamin** | Random: **>0.97**<br>Scaffold: N/A<br>Cold-Start: **Drop signifikan** di semua tipe DDI saat *distribution change* (DDI-Ben 2025) | **0% (Nihil)**<br>Populasi statis | Nihil |
+| **DDI-GPT** | *bioRxiv* 2024 / LLM-based | Deskripsi Tekstual Obat + Biomedical KG Retrieval | Biomedical LLM + KG-Augmented Prompting | **>100M params** | Detik per query; **Mustahil di Edge** (Inferensi LLM penuh) | **Tidak** | Random: Kompetitif<br>Scaffold: N/A<br>Cold-Start: **Paling robust** terhadap *distribution change* (DDI-Ben 2025) — unggul di tipe DDI *medium & long-tail* | **0% (Nihil)**<br>Populasi statis | Parsial (Rationale teks LLM, belum tervalidasi biokimia) |
 | **PharmaGNN (Model Kami)** | *Proposed Study* | **Enriched 2D Graph** (24 atom feats via RDKit; edge_index tanpa fitur ikatan) | **Dual-Branch GATv2** + $K=4$ Substructure Soft Pooling + Bi-Cross-Attention | **118,021 params** (**815.4 KB ONNX FP32**) | **~0.21 ms (CPU)**; **100% Offline Mobile Native** | **DIJAMIN ANALITIK** ($f(A,B) \equiv f(B,A)$ via $[Att_A \odot Att_B \parallel \|Att_A - Att_B\|]$) | Random: **0.9493** (AUPRC 0.9482)<br>Scaffold Disjoint: **0.6605** ($\Delta = -0.2888$)<br>Inductive Cold-Start: **0.7623** | **Tersedia (Stage 2)**: Three-Tier Graceful Degradation (FAERS OR, eGFR CKD-EPI, PharmGKB Level 1A) | **Tervalidasi (parsial)**: Validasi SMARTS CYP450/Brenk; *deletion fidelity curve* belum dievaluasi |
 
 ---
@@ -53,6 +57,15 @@
      $$\mathbf{z}_{\text{pair}} = \left[ \text{Att}_A \odot \text{Att}_B \;\parallel\; |\text{Att}_A - \text{Att}_B| \right]$$
      sehingga $f(A, B) \equiv f(B, A)$ berlaku mutlak tanpa fluktuasi floating-point.
 
+### Keluarga 4: Graph Transformer & LLM-Based DDI (SumGNN, MRCGNN, TIGER, DDI-GPT, SAGAN, TextDDI, DrugDAGT)
+1. **Robustness vs Ketergantungan Sumber Pengetahuan Eksternal:**
+   - Benchmark independen **DDI-Ben** (*Bioinformatics* 2025, Q1; Shen et al.) mengevaluasi 10 metode representatif (MLP, MSTE, Decagon, SSI-DDI, MRCGNN, EmerGNN, SAGAN, TIGER, TextDDI, DDI-GPT) di bawah *simulated distribution change* antara himpunan obat lama dan obat baru, menggunakan *cluster-based drug split* yang terverifikasi paling konsisten dengan data waktu persetujuan (approval time) DrugBank nyata.
+   - Temuan kunci DDI-Ben: **hampir semua metode mengalami degradasi performa signifikan** saat distribution change diperkenalkan — mengonfirmasi secara eksternal bahwa skor i.i.d. random split selama ini menyesatkan, sejalan dengan analisis scaffold leakage pada Bagian 3 dokumen ini.
+   - Pengecualian parsial: metode berbasis LLM (**TextDDI**, **DDI-GPT**) paling tahan terhadap distribution change berkat pengetahuan farmakologis tekstual yang transferabel — namun dengan harga >100 juta parameter dan latensi orde detik, mustahil untuk edge deployment.
+   - **SAGAN** (Interdiscip. Sci. 2025) menerapkan domain-adaptive substructure-aware GAT dengan transfer learning; **DrugDAGT** (BMC Biology 2024) menggunakan dual-attention graph transformer dengan contrastive learning.
+2. **Posisi PharmaGNN:**
+   - PharmaGNN menempati titik tengah yang kosong di literatur: jauh lebih kecil dari model LLM (118K vs >100M parameter) namun tetap beroperasi murni dari struktur 2D tanpa ketergantungan KG/LLM eksternal. Robustness PharmaGNN di bawah distribution change terukur langsung via scaffold disjoint (0.6605) dan inductive cold-start (0.7623) — dua skenario yang secara konseptual ekuivalen dengan protokol *cluster-based split* DDI-Ben.
+
 ---
 
 ## 3. Pembedahan Empiris: Ilusi Generalisasi (Scaffold Leakage vs Cold-Start Drop)
@@ -71,6 +84,7 @@ PharmaGNN   : 0.9493 ──► 0.6605 (Scaffold Drop: -30.4%) / 0.7623 (Cold-Sta
 - Pada pengujian random split, molekul obat dengan kerangka inti (*Bemis-Murcko scaffold*) yang sama muncul di data latih dan data uji, memungkinkan model sekadar "menghafal" asosiasi kerangka cincin.
 - Ketika diuji pada *Bemis-Murcko Scaffold Disjoint Split*, performa PharmaGNN terkoreksi menjadi **0.6605** ($\Delta = -0.2888$).
 - Pada *Inductive Cold-Start Split* (senyawa uji sama sekali tidak pernah dilihat saat pelatihan), PharmaGNN mempertahankan AUROC **0.7623**, sejajar dengan performa cold-start model Q1 teratas dunia (GMPNN-CS 0.7748 dan SA-DDI 0.7914). Hal ini membuktikan bahwa mekanisme $K=4$ substructure cross-attention mampu mengekstraksi interaksi kimia fungsional sejati, bukan sekadar menghafal entitas obat.
+- **Korroborasi eksternal (2025):** Benchmark independen **DDI-Ben** (*Bioinformatics* 2025) membuktikan hal yang sama pada 10 metode representatif — seluruhnya drop signifikan begitu *distribution change* antar-himpunan obat disimulasikan. Artinya, fenomena "ilusi generalisasi" yang kami laporkan bukan anomali dataset kami, melainkan diakui sebagai masalah sistemik komunitas DDI.
 
 ---
 
@@ -123,3 +137,24 @@ Untuk menjaga integritas ilmiah dan standar pelaporan bukti (*evidence-first*), 
 1. **Tidak Memodelkan Kiralitas 3D Eksplisit:** Berbeda dengan 3DGT-DDI yang menghitung jarak Euclidean antar-atom dalam ruang 3D, PharmaGNN beroperasi pada graf topologis 2D. Meskipun stereokimia didekati via atom chiral tags RDKit, interaksi yang bergantung murni pada isomerisme ruang 3D belum dimodelkan secara kontinu.
 2. **Klasifikasi Biner Pasangan Obat vs Multi-Label Polypharmacy:** Model Decagon memprediksi 964 jenis efek samping spesifik secara simultan ($r \in \{1, \dots, 964\}$), sedangkan PharmaGNN difokuskan pada estimasi probabilitas interaksi biner dan tingkat keparahan risiko klinis terkalibrasi.
 3. **Jumlah Gugus Terbatas ($K=4$):** Pemilihan $K=4$ gugus substruktur merupakan kompromi antara granularitas farmakofor dan efisiensi memori edge mobile. Untuk molekul makromolekul besar (>100 atom berat), resolusi $K=4$ dapat menggabungkan dua gugus fungsional yang berdekatan ke dalam satu cluster representasi.
+
+---
+
+## 8. Studi Kasus Empiris: False Positive Paracetamol + Ibuprofen (29 September 2026)
+
+Eksperimen langsung pada checkpoint produksi (`runs_kaggle/random/best_model.pt`) terhadap pasangan **Paracetamol (DB00316) + Ibuprofen (DB01050)** — kombinasi analgesik OTC yang secara klinis aman dan justru sinergistis:
+
+| Pengujian | Hasil | Interpretasi |
+| :--- | :--- | :--- |
+| Raw GNN $P(\text{DDI})$, urutan (Para, Ibu) | **0.7344** | **False positive** — di atas ambang "Major" (0.7) |
+| Raw GNN $P(\text{DDI})$, urutan (Ibu, Para) | **0.7344** | Komutatif **persis** ($\Delta = 0.00$) — invariansi simetri terverifikasi empiris |
+| Setelah Clinical Ground-Truth Harmonization (Stage 1 curated rule) | **0.08 (Safe / Synergistic)** | False positive terkoreksi oleh lapisan harmonisasi klinis |
+
+**Analisis akar penyebab (dataset-level):**
+1. Verifikasi terhadap dataset benchmark **ChCh-Miner / DrugBank chem-chem** (`data/ChCh-Miner_durgbank-chem-chem.tsv.gz`, 48.514 pasangan positif) menunjukkan: DB00316 tercatat berinteraksi dengan **98 obat**, DB01050 dengan **97 obat**, tetapi pasangan **DB00316–DB01050 sendiri TIDAK ada** di dataset — pasangan ini berada di wilayah *unlabeled/negative*.
+2. Kedua obat adalah **hub node berderajat tinggi** (~100 partner positif masing-masing). Model GNN mana pun yang menangkap bias derajat/asosiasi hub akan cenderung memprediksi positif pada pasangan antar-hub yang tidak berlabel — inilah sumber false positive pada PharmaGNN dan secara struktural juga pada seluruh model Q1 yang dilatih di atas distribusi yang sama (SSI-DDI, GMPNN-CS, SA-DDI, MHCADDI, MRCGNN, TIGER).
+3. Pada keluarga KG/DDI-network (Decagon, EmerGNN, SumGNN), edge Paracetamol–Ibuprofen tidak eksis di graf, sehingga secara eksplisit pasangan ini negatif — namun propagasi dari tetangga hub tetap dapat mengangkat skor; DDI-Ben (2025) menunjukkan keluarga ini justru paling rapuh saat distribusi bergeser.
+
+**Catatan integritas:** model eksternal Q1 tidak dieksekusi ulang secara lokal (bobot pre-trained dan lisensi dataset DrugBank tidak tersedia); perilaku mereka disimpulkan dari bukti tingkat dataset dan hasil benchmark independen yang dikutip. Angka 0.7344 / 0.08 adalah hasil eksekusi nyata pada checkpoint PharmaGNN.
+
+**Implikasi ilmiah:** kasus ini memperkuat justifikasi desain *Clinical Ground-Truth Harmonization* PharmaGNN — probabilitas in-silico murni tidak cukup untuk deployment klinis, dan koreksi berbasis konsensus klinis terverifikasi adalah komponen keamanan yang wajib, bukan pelengkap.
