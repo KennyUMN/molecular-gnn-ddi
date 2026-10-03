@@ -23,3 +23,6 @@ models/*.onnx
 
 # kaggle raw dumps
 kaggle_artifacts/
+
+# archify working folders (the deliverable lives in docs/)
+.archify/

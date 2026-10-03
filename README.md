@@ -6,6 +6,7 @@
 > **Evaluation Weight:** 50% Final Grade  
 > **Authors:** Kenny Valent Winalda Sembiring & Team  
 
+[![Architecture Diagram](https://img.shields.io/badge/Architecture-Animated%20Trace-8B5CF6?style=for-the-badge&logo=github-actions)](docs/architecture.gif)
 [![Documentation PDF](https://img.shields.io/badge/Project%20Guide-PDF%20Download-0284C7?style=for-the-badge&logo=adobe-acrobat-reader)](PharmaGNN_Comprehensive_Project_Guide.pdf)
 [![Slide Deck PDF](https://img.shields.io/badge/Slides-PDF%20Deck-059669?style=for-the-badge&logo=adobe-acrobat-reader)](PharmaGNN_Progress_Presentation_Slides.pdf)
 [![Test Suite](https://img.shields.io/badge/Tests-54%20Passed-10B981?style=for-the-badge&logo=pytest)](tests/)
@@ -26,6 +27,16 @@
    - **Tier 1 (Fallback):** Prediksi kimia murni saat data rekam medis tidak tersedia ($\Delta = 0$).
    - **Tier 2 (Demografis FAERS):** Penalti usia lanjut $\ge 65$ tahun ($\Delta_{\text{age}} = +0.4339$, terkalibrasi dari $\ln(\text{ROR})$ fatal-outcome FAERS), kehamilan ($+0.10$), gangguan fungsi hati ($+0.12$).
    - **Tier 3 (Farmakogenomik CPIC/PharmGKB & eGFR CKD-EPI):** Penalti kerusakan ginjal eGFR CKD-EPI 2021 ($0 - 0.25$), genotipe mutasi alel enzim hati CYP450 / transporter OATP1B1 ($+0.45$), risiko QTc CredibleMeds ($+0.35$), dan interaksi Jamu/herbal ($\le 0.40$).
+
+---
+
+## 🗺️ Diagram Arsitektur
+
+![Diagram arsitektur PharmaGNN: pipeline training Stage 1 (GATv2, ekspor ONNX) dan serving API dengan personalisasi Tier 1-3](docs/architecture.gif)
+
+> Diagram dibuat langsung dari kode repositori pada revisi `3209e25`; animasi menelusuri alur dari build dataset → training → ekspor ONNX → serving API. Jalur **Offline** menghasilkan `best_model.pt` dan `molecular_gnn_ddi.onnx`; jalur **Serving** adalah runtime yang dilayani `api/app.py` di `:8080`.
+>
+> Versi diam: [`docs/architecture.png`](docs/architecture.png) · interaktif (tema terang/gelap, search, zoom, export): [`docs/architecture.html`](docs/architecture.html)
 
 ---
 
