@@ -2,7 +2,7 @@
 
 > **Final Project — IF542 Deep Learning (3 SKS)**  
 > **Universitas Multimedia Nusantara (UMN) — Semester Ganjil 2026/2027**  
-> **Course Coordinator:** Dr. David Agustriawan, S.Kom., M.Sc., Ph.D. & Ajie Kusuma Wardhana, S.Kom., M.Eng.  
+> **Course Coordinator:** Dr. David Agustriawan, S.Kom., M.Sc., Ph.D.
 > **Evaluation Weight:** 50% Final Grade  
 > **Authors:** Kenny Valent Winalda Sembiring & Team  
 
